@@ -1,0 +1,23 @@
+sensor_fusion:
+    lidar:
+        lidar_input_topic: "/middle/rslidar_points"
+        lidar_output_topic: "/fusion/rslidar_points" 
+
+    cam:
+        cam_input_topic: "/1/FrontLeftpubmsg/camera/image"
+        cam_output_topic: "/fusion/image"
+
+camera:
+    camera_width: 1920
+    camera_height: 1080
+
+    camera_matrix: [1958.53782296511, 0.0,      1010.15988010770,
+                0.0,     1955.66274847103,  568.115926358669,
+                0.0,     0.0,      1.0     ]
+    RT: [-0.00176567, -0.999391, -0.0348548, 0.31, 
+          -0.0505621,0.0348995, -0.998111, 0.03,
+         0.998719, 0.0, -0.0505929, 0.1,
+          0.0,      0.0,        0.0,       1.0]
+
+    distort: [-0.551856904528291, 0.351954098557375, -0.00151493530804559, -0.000782756809651750, -0.137742016319233]
+
