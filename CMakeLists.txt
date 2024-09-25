@@ -156,7 +156,7 @@ add_definitions(${PCL_DEFINITIONS})
 
 add_executable(lidar_camera_fusion_node 
 	src/fusion.cpp)
-target_link_libraries(lidar_camera_fusion_node ${PCL_LIBRARIES}  ${catkin_LIBRARIES})
+target_link_libraries(lidar_camera_fusion_node ${PCL_LIBRARIES}  ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #############
 ## Install ##
 #############
