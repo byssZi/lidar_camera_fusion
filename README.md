@@ -13,8 +13,6 @@ camera内参标定，lidar和camera外参标定
 |lidar_output_topic|发布融合染色后点云的topic话题| - |
 |cam_input_topic|接收camera图像的topic话题| - |
 |cam_output_topic|发布融合lidar点云投影后图像的话题| - |
-|camera_width|图像宽度|水平方向|
-|camera_height|图像高度|竖直方向|
 |camera_matrix|camera内参|3x3的矩阵|
 |RT|lidar到camera的外参|4x4的矩阵[R,t]|
 |distort|camera的畸变系数|k1,k2,p1,p2,k3|

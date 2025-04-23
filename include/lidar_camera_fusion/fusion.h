@@ -21,26 +21,8 @@
 #include <pcl/common/transforms.h>
 #include <numeric>
 #include <pcl/filters/voxel_grid.h>
-
-
-/*
-    * 一个具有XYZ、RGB、intensity的点云类型
-    */
-struct PointXYZRGBI
-{
-    PCL_ADD_POINT4D;
-    PCL_ADD_RGB;
-    PCL_ADD_INTENSITY;
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-} EIGEN_ALIGN16;
-
-POINT_CLOUD_REGISTER_POINT_STRUCT (PointXYZRGBI,
-                            (float, x, x)
-                            (float, y, y)
-                            (float, z, z)
-                            (float, rgb, rgb)
-                            (float, intensity, intensity)
-)
+#include "projector_lidar.hpp"
+#include "Lidar_parser_base.h"
 
 class fusion {
     private:
@@ -59,40 +41,22 @@ class fusion {
     std::string cam_sub_topic;//接收图像话题
     std::string cam_pub_topic; //发布融合后图像话题
 
-
-    bool is_get_image;
     void lidar_callback(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg);
     void cam_callback(const sensor_msgs::ImageConstPtr& Imgmsg);
     void loadCalibrationData(void);
-    
-    cv::Mat visImg;   //最终输出3D-2D图像
-    cv::Mat overlay;  //画得图像
+    cv::Mat img;
     sensor_msgs::ImagePtr image_msg;
     sensor_msgs::PointCloud2 fusion_msg;  //等待发送的点云消息
 
-    cv::Mat P_rect_00; // 3x4 projection matrix after rectification 矫正后的3*4的投影矩阵
     cv::Mat RT; // rotation matrix and translation vector 旋转矩阵和平移向量AUTOWARE格式，这个格式对应一般的外参标定结果（旋转平移矩阵）需要参考https://blog.csdn.net/qq_22059843/article/details/103022451
     cv::Mat D; 
     cv::Mat K; 
     std::vector<double> camera_matrix;
     std::vector<double> calib;
     std::vector<double> distort;
-    cv::Mat map1, map2;
-    cv::Mat NewCameraMatrix;
-    double fx, fy, cx, cy;
-    int imagewidth, imageheight;
-    double alpha;
-    std::vector<cv::Vec3b> image_color; // 一维数组存储颜色数据
 
-    // 获取颜色的帮助函数
-    cv::Vec3b getColor(int row, int col) const {
-        return image_color[row * imagewidth + col];
-    }
-
-    // 设置颜色的帮助函数
-    void setColor(int row, int col, const cv::Vec3b& color) {
-        image_color[row * imagewidth + col] = color;
-    }
+    // 使用 Projector 类进行投影
+    Projector projector;
 
     public:
 
