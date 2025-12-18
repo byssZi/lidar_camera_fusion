@@ -99,7 +99,7 @@ public:
     return cv::Scalar(color[0], color[1], color[2]);
   }
 
-  std::pair<pcl::PointCloud<PointXYZRGBI>::Ptr, cv::Mat> ProjectToRawMat(cv::Mat img, cv::Mat K, cv::Mat D, cv::Mat R,
+  std::pair<pcl::PointCloud<PointXYZRGBIUV>::Ptr, cv::Mat> ProjectToRawMat(cv::Mat img, cv::Mat K, cv::Mat D, cv::Mat R,
                           cv::Mat T) {
     cv::Mat I = cv::Mat::eye(3, 3, CV_32FC1);
     cv::Mat mapX, mapY;
@@ -112,10 +112,10 @@ public:
     cv::Mat R_ = R;
     cv::Mat T_ = T;
     // 检查 oriCloud 和 T_ 的尺寸
-    pcl::PointCloud<PointXYZRGBI>::Ptr fusion_pcl_ptr (new pcl::PointCloud<PointXYZRGBI>);   //放在这里是因为，每次都需要重新初始化
+    pcl::PointCloud<PointXYZRGBIUV>::Ptr fusion_pcl_ptr (new pcl::PointCloud<PointXYZRGBIUV>);   //放在这里是因为，每次都需要重新初始化
     if (oriCloud.empty() || T_.empty() || oriCloud.cols == 0 || T_.cols == 0) {
         std::cerr << "Error: oriCloud or T_ is empty or has invalid dimensions." << std::endl;
-        return std::pair<pcl::PointCloud<PointXYZRGBI>::Ptr, cv::Mat>(fusion_pcl_ptr, outImg);
+        return std::pair<pcl::PointCloud<PointXYZRGBIUV>::Ptr, cv::Mat>(fusion_pcl_ptr, outImg);
     }
     cv::Mat projCloud2d = K * (R_ * oriCloud + repeat(T_, 1, oriCloud.cols));
     float maxDist = 0;
@@ -134,7 +134,7 @@ public:
       float intensity = intensitys[i];
 
       if (x2d >= 0 && y2d >= 0 && x2d < img.cols && y2d < img.rows && z > 0) {
-        PointXYZRGBI  p;
+        PointXYZRGBIUV  p;
         //融合后RGB点云（x,y,z）
         p.x = oriCloud.at<float>(0, i);
         p.y = oriCloud.at<float>(1, i);
@@ -145,6 +145,8 @@ public:
         p.g = color[1];
         p.r = color[2];
         p.intensity = intensity;
+        p.u = static_cast<float>(x2d);
+        p.v = static_cast<float>(y2d);
         fusion_pcl_ptr->points.push_back(p);
 
         maxDist = std::max(maxDist, d);
@@ -216,10 +218,10 @@ public:
         circle(outImg, points[i].point, point_size_, color, -1);
       }
     }
-    return std::pair<pcl::PointCloud<PointXYZRGBI>::Ptr, cv::Mat>(fusion_pcl_ptr, outImg);
+    return std::pair<pcl::PointCloud<PointXYZRGBIUV>::Ptr, cv::Mat>(fusion_pcl_ptr, outImg);
   }
 
-  std::pair<pcl::PointCloud<PointXYZRGBI>::Ptr, cv::Mat> ProjectToRawImage(cv::Mat img, Eigen::Matrix3d K,
+  std::pair<pcl::PointCloud<PointXYZRGBIUV>::Ptr, cv::Mat> ProjectToRawImage(cv::Mat img, Eigen::Matrix3d K,
                             std::vector<double> D, Eigen::Matrix4d json_param) {
     cv::Mat K1, D1, R1, T1;
     float k[9], d[8], r[9], t[3];
